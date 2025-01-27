@@ -33,28 +33,7 @@ def simulate_wave(n_samples, phi_function, psi_function, boundary_function, x_st
                   random_seed=42, dtype=tf.float32) -> Tuple[
     Tuple[tf.Tensor, tf.Tensor], Tuple[tf.Tensor, tf.Tensor, tf.Tensor],
     Tuple[tf.Tensor, tf.Tensor]]:
-    """
-    Simulate the wave equation in 1D or 2D with a given initial condition and Dirichlet boundary conditions.
-    Args:
-        n_samples (int): number of samples to generate
-        dimension (int): dimension of the wave equation. Either 1 or 2.
-        phi_function (function): Function that returns the initial condition of the wave equation on u.
-        psi_function (function): Function that returns the initial condition of the wave equation on u_t.
-        boundary_function_start (function): Function that returns the boundary condition of the wave equation on u at the start of the domain.
-        boundary_function_end (function): Function that returns the boundary condition of the wave equation on u at the end of the domain.
-        x_start (float, optional): Start of the domain. Defaults to 0.
-        length (float, optional): Length of the domain. Defaults to 1.
-        time (float, optional): Time frame of the simulation. Defaults to 1.
-        n_init (int, optional): number of initial samples to generate. If None, then n_init = n_samples. Defaults to None.
-        n_bndry (int, optional): number of boundary samples to generate. If None, then n_bndry = n_samples. Defaults to None.
-        random_seed (int, optional): Random seed for reproducibility. Defaults to 42.
-        dtype (tf.dtype, optional): Data type of the samples. Defaults to tf.float32.
 
-    Returns:
-        tuple[tuple[tf.Tensor, tf.Tensor], tuple[tf.Tensor, tf.Tensor, tf.Tensor], tuple[tf.Tensor, tf.Tensor]]: Samples of the wave equation. \
-            Returns a tuple of tensors (equation_samples, initial_samples, boundary_samples).
-
-    """
     if n_init is None:
         n_init = n_samples
     if n_bndry is None:

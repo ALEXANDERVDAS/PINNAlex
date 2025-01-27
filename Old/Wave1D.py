@@ -145,7 +145,6 @@ for epoch in range(epochs):
 
 print("Training completed.")
 
-# Plot training losses
 plt.figure(figsize=(8, 5))
 plt.plot(loss_bc_values, label="Boundary Condition Loss")
 plt.plot(loss_pde_values, label="PDE Residual Loss")
@@ -158,7 +157,6 @@ plt.legend()
 plt.title("Loss Evolution During Training")
 plt.show()
 
-# Interactive wave visualization
 interact(visualize_wave, t_val=t_slider)
 
 
@@ -177,7 +175,6 @@ def generate_heatmap_data(n_points, model=None):
     else:
         u_pred = None
 
-    # Ground truth wave function (analytical solution)
     u_actual_flat = np.sin(5 * np.pi * x_flat) * np.cos(5 * c * np.pi * t_flat) + 2 * np.sin(7 * np.pi * x_flat) * np.cos(7 * c * np.pi * t_flat)
     u_actual = u_actual_flat.reshape(n_points, n_points)
 
@@ -214,5 +211,4 @@ def visualize_heatmap():
     plt.show()
 
 
-# Generate and plot heatmap
 visualize_heatmap()

@@ -52,7 +52,7 @@ def loss_fn(model, X_train, boundary_condition, pde_residual, X_data, u_data):
 
 # Example training data
 X_train = tf.convert_to_tensor(np.random.rand(1000, 3), dtype=tf.float32)  # Random points for (x, y, t)
-u_bc = tf.convert_to_tensor(np.zeros((1000, 1)), dtype=tf.float32)  # Example BC values
+u_bc = tf.convert_to_tensor(np.zeros((1000, 1)), dtype=tf.float32)
 
 # Example data points (ground truth)
 n_data_points = 5000

@@ -64,27 +64,19 @@ class BurgersPINN:
 
         self.lam_bound_tf = tf.compat.v1.placeholder(tf.float32, shape=self.lam_bound_val.shape)
         self.lam_ics_tf = tf.compat.v1.placeholder(tf.float32, shape=self.lam_bound_val.shape)
-        # self.lam_ut_tf = tf.compat.v1.placeholder(tf.float32, shape=self.lam_bound_val.shape)
         self.lam_r_tf = tf.compat.v1.placeholder(tf.float32, shape=self.lam_bound_val.shape)
 
 
         # Evaluate predictions
         self.u_ics_pred = self.net_u(self.t_ics_tf, self.x_ics_tf)
-        # self.u_t_ics_pred = self.net_u_t(self.t_ics_tf, self.x_ics_tf) # Only used for wave function in NTK paper
         self.u_bc1_pred = self.net_u(self.t_bc1_tf, self.x_bc1_tf)
         self.u_bc2_pred = self.net_u(self.t_bc2_tf, self.x_bc2_tf)
 
         self.u_pred = self.net_u(self.t_u_tf, self.x_u_tf)
         self.r_pred = self.net_r(self.t_r_tf, self.x_r_tf)
 
-        # # Define predictions for NTK computation
-        # self.u_ntk_pred = self.net_u(self.t_u_ntk_tf, self.x_u_ntk_tf)
-        # self.ut_ntk_pred = self.net_u_t(self.t_ut_ntk_tf, self.x_ut_ntk_tf)
-        # self.r_ntk_pred = self.net_r(self.t_r_ntk_tf, self.x_r_ntk_tf)
-
         # Boundary loss and Initial loss
         self.loss_ics_u = tf.reduce_mean(tf.square(self.u_ics_tf - self.u_ics_pred))
-        # self.loss_ics_u_t = tf.reduce_mean(tf.square(self.u_t_ics_pred))
         self.loss_bc1 = tf.reduce_mean(tf.square(self.u_bc1_tf - self.u_bc1_pred))
         self.loss_bc2 = tf.reduce_mean(tf.square(self.u_bc2_tf - self.u_bc2_pred))
 
@@ -116,12 +108,6 @@ class BurgersPINN:
         self.saver = tf.compat.v1.train.Saver()
 
         self.squared_mean_height_solution = []
-
-
-        # NTK logger
-        self.K_u_log = []
-        self.K_ut_log = []
-        self.K_r_log = []
 
         # weights logger
         self.lam_u_log = []
@@ -172,10 +158,6 @@ class BurgersPINN:
                               self.biases)
         return u
 
-    # Forward pass for du/dt r
-    # def net_u_t(self, t, x):
-    #     u_t = tf.gradients(self.net_u(t, x), t)[0] / self.sigma_t
-    #     return u_t
 
     # Forward pass for the residual
     def net_r(self, t, x):
@@ -271,35 +253,6 @@ class BurgersPINN:
 
                 start_time = timeit.default_timer()
 
-            if log_NTK:
-                if it % 100 == 0:
-                    print("Compute NTK...")
-                    X_bc_batch = np.vstack([X_ics_batch, X_bc1_batch, X_bc2_batch])
-                    X_ics_batch, u_ics_batch = self.fetch_minibatch(self.ics_sampler, batch_size)
-
-                    tf_dict = {self.t_u_ntk_tf: X_bc_batch[:, 0:1], self.x_u_ntk_tf: X_bc_batch[:, 1:2],
-                               self.t_ut_ntk_tf: X_ics_batch[:, 0:1], self.x_ut_ntk_tf: X_ics_batch[:, 1:2],
-                               self.t_r_ntk_tf: X_res_batch[:, 0:1], self.x_r_ntk_tf: X_res_batch[:, 1:2]}
-
-                    K_u_value, K_ut_value, K_r_value = self.sess.run([self.K_u, self.K_ut, self.K_r], tf_dict)
-
-                    trace_K = np.trace(K_u_value) + np.trace(K_ut_value) + \
-                              np.trace(K_r_value)
-
-                    # Store NTK matrices
-                    self.K_u_log.append(K_u_value)
-                    self.K_ut_log.append(K_ut_value)
-                    self.K_r_log.append(K_r_value)
-
-                    # if update_lam:
-                    #     self.lam_u_val = trace_K / np.trace(K_u_value)
-                    #     self.lam_ut_val = trace_K / np.trace(K_ut_value)
-                    #     self.lam_r_val = trace_K / np.trace(K_r_value)
-                    #
-                    #     # Store NTK weights
-                    #     self.lam_u_log.append(self.lam_u_val)
-                    #     self.lam_ut_log.append(self.lam_ut_val)
-                    #     self.lam_r_log.append(self.lam_r_val)
 
     # Evaluates predictions at test points
     def predict_u(self, X_star):

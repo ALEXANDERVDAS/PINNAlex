@@ -1,13 +1,12 @@
 import math
 
 import tensorflow as tf
-# from Compute_Jacobian import jacobian # Please download 'Compute_Jacobian.py' in the repository
 import numpy as np
 
 from matplotlib import colors
 from scipy.interpolate import griddata
 import matplotlib.pyplot as plt
-from Wave1D.WavePINN import Sampler
+from Wave1D.Sample import Sample
 from BurgersPINN import BurgersPINN
 import scipy.io
 
@@ -51,16 +50,16 @@ bc2_coords = np.array([[0.0, 1.0],
 dom_coords = np.array([[0.0, -1.0],
                         [1.0, 1.0]])
 
-# Create initial conditions samplers
-ics_sampler = Sampler(2, ics_coords, lambda x: ics(x, a, v), name='Initial Condition 1')
+# Create initial conditions Samples
+ics_Sample = Sample(2, ics_coords, lambda x: ics(x, a, v), name='Initial Condition 1')
 
-# Create boundary conditions samplers
-bc1 = Sampler(2, bc1_coords, lambda x: bnd(x, a, v), name='Dirichlet BC1')
-bc2 = Sampler(2, bc2_coords, lambda x: bnd(x, a, v), name='Dirichlet BC2')
-bcs_sampler = [bc1, bc2]
+# Create boundary conditions Samples
+bc1 = Sample(2, bc1_coords, lambda x: bnd(x, a, v), name='Dirichlet BC1')
+bc2 = Sample(2, bc2_coords, lambda x: bnd(x, a, v), name='Dirichlet BC2')
+bcs_Sample = [bc1, bc2]
 
-# Create residual sampler
-res_sampler = Sampler(2, dom_coords, lambda x: r(x, a, v), name='Forcing')
+# Create residual Sample
+res_Sample = Sample(2, dom_coords, lambda x: r(x, a, v), name='Forcing')
 
 # Define PINN model
 a = 2
@@ -68,7 +67,7 @@ v = 0.01/math.pi
 
 layers = [2, 500, 500, 500, 1] # Usually 3 layers of 500
 kernel_size = 300
-model = BurgersPINN(layers, operator, ics_sampler, bcs_sampler, res_sampler, v, kernel_size)
+model = BurgersPINN(layers, operator, ics_Sample, bcs_Sample, res_Sample, v, kernel_size)
 # Train model
 itertaions = 1
 

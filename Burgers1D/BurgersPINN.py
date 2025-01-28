@@ -12,7 +12,7 @@ import os
 
 class BurgersPINN:
     # Initialize the class
-    def __init__(self, layers, operator, ics_sampler, bcs_sampler, res_sampler, v, kernel_size):
+    def __init__(self, layers, operator, ics_sampler, bcs_sampler, res_sampler, v):
         # Normalization
         X, _ = res_sampler.sample(np.int32(1e5))
         self.mu_X, self.sigma_X = X.mean(0), X.std(0)
@@ -38,7 +38,6 @@ class BurgersPINN:
         # Wave constant
         self.v = tf.constant(v, dtype=tf.float32)
 
-        self.kernel_size = kernel_size  # Size of the NTK matrix
 
         # Define Tensorflow session
         self.sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=True))

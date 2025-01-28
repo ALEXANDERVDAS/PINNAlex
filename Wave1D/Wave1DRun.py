@@ -22,6 +22,7 @@ def u(x, a, c):
     return np.sin(5 * np.pi * x) * np.cos(5 * c * np.pi * t) + \
         a * np.sin(7 * np.pi * x) * np.cos(7 * c * np.pi * t)
 
+#UNNECESSARY u_xx - c^2 u_tt should be 0 anyway (WAVE FUNTION). Same for u_t should be 0
 # def u_t(x,a, c):
 #     t = x[:,0:1]
 #     x = x[:,1:2]

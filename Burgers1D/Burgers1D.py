@@ -13,12 +13,7 @@ import scipy.io
 
 # Define the exact solution and its derivatives
 # def u(x, a, v): # Real solution not known for Burgers.
-#     """
-#     :param x: x = (t, x)
-#     """
-#     t = x[:,0:1]
-#     x = x[:,1:2]
-#     return 2 / (1 + (np.exp((x - t) / v)))
+#     return
 
 def ics(x, a, v):
     t = x[:,0:1]
@@ -66,8 +61,7 @@ a = 2
 v = 0.01/math.pi
 
 layers = [2, 500, 500, 500, 1] # Usually 3 layers of 500
-kernel_size = 300
-model = BurgersPINN(layers, operator, ics_Sample, bcs_Sample, res_Sample, v, kernel_size)
+model = BurgersPINN(layers, operator, ics_Sample, bcs_Sample, res_Sample, v)
 # Train model
 itertaions = 1
 

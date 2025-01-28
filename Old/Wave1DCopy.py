@@ -115,7 +115,6 @@ def plot_heatmap(model, title=""):
     plt.show()
 
 
-# Training Data Points Visualization
 def plot_data_points(tx_samples, tx_init, tx_bndry):
     plt.figure(figsize=(8, 6))
     plt.scatter(tx_samples[:, 0], tx_samples[:, 1], s=10, label="Equation Samples")
@@ -146,19 +145,15 @@ def plot_loss(history):
     """
     plt.figure(figsize=(10, 6))
 
-    # Plot residual loss
     plt.plot(history.history['loss_residual'], label="Residual Loss", linestyle="--")
 
-    # Plot initial condition loss
     plt.plot(history.history['loss_initial'], label="Initial Condition Loss", linestyle="-.")
 
-    # Plot boundary condition loss
     plt.plot(history.history['loss_boundary'], label="Boundary Condition Loss", linestyle=":")
 
-    # Plot mean absolute error
     plt.plot(history.history['mean_absolute_error'], label="Total Loss", linestyle="-")
 
-    # Set log scale for better visualization
+
     plt.yscale("log")
     plt.xlabel("Epochs")
     plt.ylabel("Loss (log scale)")
@@ -167,7 +162,7 @@ def plot_loss(history):
     plt.grid(True, which="both", linestyle="--", linewidth=0.5)
     plt.show()
 
-# Actual vs Predicted for Fixed Time
+
 def plot_fixed_time(model, t_fixed):
     n_points = 100
     x_vals = np.linspace(0, length, n_points)

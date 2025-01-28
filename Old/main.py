@@ -2,11 +2,10 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Define the wave speed
+
 c = 1.0
 
 
-# Define the neural network
 class PINN(tf.keras.Model):
     def __init__(self):
         super(PINN, self).__init__()
@@ -19,7 +18,6 @@ class PINN(tf.keras.Model):
         return self.output_layer(x)
 
 
-# Compute the PDE residual
 def wave_pde(x, y, t, model):
     with tf.GradientTape(persistent=True) as tape:
         tape.watch([x, y, t])
@@ -34,7 +32,6 @@ def wave_pde(x, y, t, model):
     return u_tt - c ** 2 * (u_xx + u_yy)
 
 
-# Loss function
 def loss_fn(model, X_train, boundary_condition, pde_residual, X_data, u_data):
     u_pred = model(X_train)  # Predicted solution
     u_bc, u_bc_pred = boundary_condition  # Boundary condition and predicted BC values
@@ -50,11 +47,9 @@ def loss_fn(model, X_train, boundary_condition, pde_residual, X_data, u_data):
     return loss_bc, loss_pde, loss_data
 
 
-# Example training data
 X_train = tf.convert_to_tensor(np.random.rand(1000, 3), dtype=tf.float32)  # Random points for (x, y, t)
 u_bc = tf.convert_to_tensor(np.zeros((1000, 1)), dtype=tf.float32)
 
-# Example data points (ground truth)
 n_data_points = 5000
 X_data = np.random.rand(n_data_points, 3)  # Randomly sampled data points
 u_data = np.sin(np.pi * X_data[:, 0:1]) * np.sin(np.pi * X_data[:, 1:2]) * np.cos(
@@ -63,11 +58,9 @@ u_data = np.sin(np.pi * X_data[:, 0:1]) * np.sin(np.pi * X_data[:, 1:2]) * np.co
 X_data = tf.convert_to_tensor(X_data, dtype=tf.float32)
 u_data = tf.convert_to_tensor(u_data, dtype=tf.float32)
 
-# Define model and optimizer
 model = PINN()
 optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
 
-# Training loop with loss tracking
 loss_bc_values = []
 loss_pde_values = []
 loss_data_values = []
@@ -94,7 +87,6 @@ for epoch in range(epochs):
 
 print("Training completed.")
 
-# Generate predictions for visualization
 n_points = 100
 x_vals = np.linspace(0, 1, n_points)
 y_vals = np.linspace(0, 1, n_points)
@@ -116,7 +108,6 @@ for t in range (11):
     # Ground truth wave function (example sine wave solution)
     u_actual_flat = np.sin(np.pi * x_flat) * np.sin(np.pi * y_flat) * np.cos(np.pi * t_val)
 
-    # Reshape for plotting
     u_pred = u_pred_flat.reshape(n_points, n_points)
     u_actual = u_actual_flat.reshape(n_points, n_points)
 

@@ -6,14 +6,12 @@ from scipy.interpolate import griddata
 import matplotlib.pyplot as plt
 
 
-
 def plot_weights(model):
     for layer in model.layers:
         weights, biases = layer.get_weights()  # Get weights and biases
         print(f"Layer: {layer.name}")
         print(f"Weights:\n{weights}")
         print(f"Biases:\n{biases}\n")
-
 
 def plot_fixed_time(model, t_fixed, u, a, c):
     n_points = 100

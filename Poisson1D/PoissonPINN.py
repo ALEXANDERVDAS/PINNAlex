@@ -34,17 +34,11 @@ class PoissonPINN:
         self.x_r_tf = tf.placeholder(tf.float32, shape=(None, 1))
         self.r_tf = tf.placeholder(tf.float32, shape=(None, 1))
 
-        self.x_u_ntk_tf = tf.placeholder(tf.float32, shape=(self.kernel_size, 1))
-        self.x_r_ntk_tf = tf.placeholder(tf.float32, shape=(self.kernel_size, 1))
-
         # Evaluate predictions
         self.u_bc_pred = self.net_u(self.x_bc_tf)
 
         self.u_pred = self.net_u(self.x_u_tf)
         self.r_pred = self.net_r(self.x_r_tf)
-
-        self.u_ntk_pred = self.net_u(self.x_u_ntk_tf)
-        self.r_ntk_pred = self.net_r(self.x_r_ntk_tf)
 
         # Boundary loss
         self.loss_bcs = 100 * tf.reduce_mean(tf.square(self.u_bc_pred - self.u_bc_tf))
@@ -61,12 +55,9 @@ class PoissonPINN:
         starter_learning_rate = 1e-6 # WAS 1e-2 (1e-3 better for ADAM)   tested on highfreq20 (SGDM 4e-7 (step 5000)) (Nesterov 1e-7) (SGD 1e-6) (Adagrad 1e-2) (ADAM 5e-4) (Adam can maybe be optimized more (check loss))
         self.learning_rate = tf.train.exponential_decay(starter_learning_rate, self.global_step,
                                                         5000, 0.9, staircase=False)
-        # Passing global_step to minimize() will increment it at each step.
-        # To compute NTK, it is better to use SGD optimizer9.21e-03 3
-        # since the corresponding gradient flow is not exactly same. 5
         # self.train_op = tf.train.MomentumOptimizer(self.learning_rate, 0.9).minimize(self.loss, global_step=self.global_step) #GradientDescentOptimizer / AdamOptimizer / AdagradOptimizer / MomentumOptimizer(, 0.9)
         # self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss, global_step=self.global_step)
-        optimizer = tf.train.GradientDescentOptimizer(self.learning_rate)
+        optimizer = tf.train.GradientDescentOptimizer(self.learning_rate) #Gradient Clipping. Necessary due to exploding gradient. Boundary loss explodes
         gvs = optimizer.compute_gradients(self.loss)
         capped_gvs = [(tf.clip_by_value(grad, -1e10, 1e10), var) for grad, var in gvs]
         self.train_op = optimizer.apply_gradients(capped_gvs, global_step=self.global_step)
@@ -85,10 +76,6 @@ class PoissonPINN:
         self.loss_bcs_log = []
         self.loss_res_log = []
 
-        # NTK logger
-        self.K_uu_log = []
-        self.K_rr_log = []
-        self.K_ur_log = []
 
         # Weights logger
         self.weights_log = []
@@ -102,13 +89,6 @@ class PoissonPINN:
         return tf.Variable(tf.random.normal([in_dim, out_dim], dtype=tf.float32) * xavier_stddev,
                            dtype=tf.float32)
 
-    # NTK initialization
-    def NTK_init(self, size):
-        in_dim = size[0]
-        out_dim = size[1]
-        std = 1. / np.sqrt(in_dim)
-        return tf.Variable(tf.random.normal([in_dim, out_dim], dtype=tf.float32) * std,
-                           dtype=tf.float32)
 
     # Initialize network weights and biases using Xavier initialization
     def initialize_NN(self, layers):

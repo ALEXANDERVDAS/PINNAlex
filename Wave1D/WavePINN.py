@@ -10,9 +10,9 @@ import os
 
 
 class WavePINN:
-    # Initialize the class
+
     def __init__(self, layers, operator, samples, c):
-        # Normalization
+
         X, _ = samples[2].sample(np.int32(1e5))
         self.mu_X, self.sigma_X = X.mean(0), X.std(0)
         self.mu_t, self.sigma_t = self.mu_X[0], self.sigma_X[0]
@@ -108,11 +108,6 @@ class WavePINN:
 
         self.squared_mean_height_solution = []
 
-        # NTK logger
-        self.K_u_log = []
-        self.K_ut_log = []
-        self.K_r_log = []
-
         # weights logger
         self.lam_u_log = []
         self.lam_ut_log = []
@@ -122,7 +117,7 @@ class WavePINN:
         init = tf.compat.v1.global_variables_initializer()
         self.sess.run(init)
 
-    # Initialize network weights and biases using Xavier initialization
+
     def initialize_NN(self, layers):
         # Xavier initialization
         def xavier_init(size):
@@ -142,7 +137,7 @@ class WavePINN:
             biases.append(b)
         return weights, biases
 
-    # Evaluates the forward pass
+
     def forward_pass(self, H, layers, weights, biases):
         num_layers = len(layers)
         for l in range(0, num_layers - 2):
@@ -162,7 +157,7 @@ class WavePINN:
                               self.biases)
         return u
 
-    # Forward pass for du/dt r
+
     def net_u_t(self, t, x):
         u_t = tf.gradients(self.net_u(t, x), t)[0] / self.sigma_t
         return u_t
@@ -177,20 +172,6 @@ class WavePINN:
         return residual
 
 
-    # Compute the empirical NTK = J J^T
-    def compute_ntk(self, J1_list, D1, J2_list, D2):
-
-        N = len(J1_list)
-
-        Ker = tf.zeros((D1, D2))
-        for k in range(N):
-            J1 = tf.reshape(J1_list[k], shape=(D1, -1))
-            J2 = tf.reshape(J2_list[k], shape=(D2, -1))
-
-            K = tf.matmul(J1, tf.transpose(J2))
-            Ker = Ker + K
-        return Ker
-
     def fetch_minibatch(self, sampler, N):
         X, Y = sampler.sample(N)
         X = (X - self.mu_X) / self.sigma_X
@@ -202,12 +183,11 @@ class WavePINN:
 
         start_time = timeit.default_timer()
         for it in range(iter):
-            # Fetch boundary mini-batches
+
             X_ics_batch, u_ics_batch = self.fetch_minibatch(self.ics_sample, batchsize // 3)
             X_bc1_batch, _ = self.fetch_minibatch(self.bcs_sample[0], batchsize // 3)
             X_bc2_batch, _ = self.fetch_minibatch(self.bcs_sample[1], batchsize // 3)
 
-            # Fetch residual mini-batch
             X_res_batch, _ = self.fetch_minibatch(self.res_sample, batchsize)
 
             # Define a dictionary for associating placeholders with data
@@ -221,7 +201,7 @@ class WavePINN:
                        self.lam_ut_tf: self.lam_ut_val,
                        self.lam_r_tf: self.lam_r_val}
 
-            # Run the Tensorflow session to minimize the loss
+            # Run
             self.sess.run(self.train_op, tf_dict)
 
             if it & 100 == 0:
